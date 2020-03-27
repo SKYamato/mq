@@ -38,15 +38,12 @@ public class ProducerAsyncCallBack {
         //发送消息
         producer.send(message, new AsyncCallback() {
             /**
-             * 正常回调
+             * MQ成功接收消息
              */
             @Override
             public void onSuccess() {
-                /**
-                 * MQ成功接收消息
-                 */
-                //后续业务代码
                 countDownLatch.countDown();
+                //后续业务代码
             }
 
             /**

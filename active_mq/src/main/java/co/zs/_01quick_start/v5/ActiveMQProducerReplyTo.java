@@ -5,7 +5,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import javax.jms.*;
 
 /**
- * 消息生产者，reply to
+ * 使用reply to实现生产者消费者同步
  *
  * @author shuai
  * @date 2020/03/24 10:50
@@ -30,17 +30,27 @@ public class ActiveMQProducerReplyTo {
 
         //5、创建producer，写入消息
         MessageProducer producer = session.createProducer(queue);
-        for (int i = 0; i < 20; i++) {
-            TextMessage message = session.createTextMessage("message" + i);
-            /**
-             * 指定reply to的destination地址
-             */
-            message.setJMSReplyTo(session.createQueue("reply"));
-            producer.send(message);
-            //Thread.sleep(1000);
-        }
+        TextMessage message = session.createTextMessage("message");
+        /**
+         * 指定reply to的destination地址
+         */
+        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        message.setJMSReplyTo(temporaryQueue);
+        producer.send(message);
+        System.out.println("消息发送完毕");
+
+        /**
+         * 监听临时destination
+         */
+        MessageConsumer consumer = session.createConsumer(temporaryQueue);
+        consumer.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                System.out.println("收到消息确认");
+            }
+        });
 
         //6、关闭连接
-        connection.close();
+        //connection.close();
     }
 }

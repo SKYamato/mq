@@ -1,11 +1,12 @@
-package co.zs._05correlation;
+package co.zs._05correlation_id;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
+import java.util.UUID;
 
 /**
- * 消息生产者
+ * 消息生产者，使用correlationId相互通信
  *
  * @author shuai
  * @date 2020/03/24 10:50
@@ -29,15 +30,32 @@ public class ActiveMQProducerCorrelation {
 
         //5、创建producer，写入消息
         MessageProducer producer = session.createProducer(queue);
+
+        System.out.println("producer初始化成功。。。");
+
         TextMessage message = session.createTextMessage("message");
         /**
          * 创建JMSCorrelationID
          */
-        message.setJMSCorrelationID("se");
+        String cid = UUID.randomUUID().toString();
+        message.setJMSCorrelationID(cid);
+        message.setStringProperty("type", "C");
 
         producer.send(message);
+        System.out.println(message.getText() + " ：消息发送完成");
 
+        MessageConsumer consumer = session.createConsumer(queue, "JMSCorrelationID='" + cid + "' AND type='P'");
+        consumer.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                try {
+                    System.out.println("收到消息反馈『" + ((TextMessage) message).getText() + "』");
+                } catch (JMSException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         //6、关闭连接
-        connection.close();
+        //connection.close();
     }
 }
