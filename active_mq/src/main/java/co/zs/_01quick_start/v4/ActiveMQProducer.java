@@ -13,8 +13,7 @@ import javax.jms.*;
  * @date 2020/03/24 10:50
  */
 public class ActiveMQProducer {
-    @lombok.SneakyThrows
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //1、获取连接工厂
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnectionFactory.DEFAULT_USER,
@@ -27,6 +26,8 @@ public class ActiveMQProducer {
 //         */
 //        connectionFactory.setSendAcksAsync(true);
         ActiveMQConnection connection = (ActiveMQConnection) connectionFactory.createConnection();
+        connection.start();
+
         /**
          * 2.1、设置异步发送消息
          */

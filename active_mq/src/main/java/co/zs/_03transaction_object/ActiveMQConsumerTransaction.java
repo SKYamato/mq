@@ -12,8 +12,8 @@ import java.util.Arrays;
  * @date 2020/03/24 11:22
  */
 public class ActiveMQConsumerTransaction {
-    @lombok.SneakyThrows
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws Exception {
         //1、获取连接工厂
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnectionFactory.DEFAULT_USER,

@@ -11,8 +11,7 @@ import javax.jms.*;
  * @date 2020/03/24 10:50
  */
 public class ActiveMQProducerTopic {
-    @lombok.SneakyThrows
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //1、获取连接工厂
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnectionFactory.DEFAULT_USER,
@@ -21,6 +20,8 @@ public class ActiveMQProducerTopic {
 
         //2、获取一个ActiveMQ连接
         Connection connection = connectionFactory.createConnection();
+        connection.start();
+
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         /**

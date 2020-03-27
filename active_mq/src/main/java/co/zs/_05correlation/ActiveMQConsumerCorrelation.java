@@ -1,16 +1,16 @@
-package co.zs._01quick_start;
+package co.zs._05correlation;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 
 /**
- * 消息生产者
+ * 消息消费者
  *
  * @author shuai
- * @date 2020/03/24 10:50
+ * @date 2020/03/24 11:22
  */
-public class ActiveMQProducer {
+public class ActiveMQConsumerCorrelation {
     public static void main(String[] args) throws Exception {
         //1、获取连接工厂
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
@@ -20,23 +20,25 @@ public class ActiveMQProducer {
 
         //2、获取一个ActiveMQ连接
         Connection connection = connectionFactory.createConnection();
-
         connection.start();
 
+        //3、获取session
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         //4、获取destination，消费者会从这里取消息
-        Queue queue = session.createQueue("user");
+        Destination queue = session.createQueue("user");
 
-        //5、创建producer，写入消息
-        MessageProducer producer = session.createProducer(queue);
-        for (int i = 0; i < 20; i++) {
-            TextMessage message = session.createTextMessage("message" + i);
-            producer.send(message);
-            //Thread.sleep(1000);
+        //5、创建consumer，获取消息
+        MessageConsumer consumer = session.createConsumer(queue);
+
+        while (true) {
+            TextMessage receive = (TextMessage) consumer.receive();
+            String jmsCorrelationID = receive.getJMSCorrelationID();
+            if (jmsCorrelationID.equals("se")) {
+                //--------------建立消费者与生产者之间的联系----------------//
+
+            }
+            System.out.println(receive.getText());
         }
-
-        //6、关闭连接
-        connection.close();
     }
 }

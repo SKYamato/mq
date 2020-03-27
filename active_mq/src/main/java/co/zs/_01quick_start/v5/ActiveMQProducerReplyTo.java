@@ -1,26 +1,26 @@
-package co.zs._01quick_start;
+package co.zs._01quick_start.v5;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 
 /**
- * 消息生产者
+ * 消息生产者，reply to
  *
  * @author shuai
  * @date 2020/03/24 10:50
  */
-public class ActiveMQProducer {
+public class ActiveMQProducerReplyTo {
+
     public static void main(String[] args) throws Exception {
         //1、获取连接工厂
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnectionFactory.DEFAULT_USER,
                 ActiveMQConnectionFactory.DEFAULT_PASSWORD,
-                "tcp://localhost:61616");
+                "tcp://127.0.0.1:5671");
 
         //2、获取一个ActiveMQ连接
         Connection connection = connectionFactory.createConnection();
-
         connection.start();
 
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -32,6 +32,10 @@ public class ActiveMQProducer {
         MessageProducer producer = session.createProducer(queue);
         for (int i = 0; i < 20; i++) {
             TextMessage message = session.createTextMessage("message" + i);
+            /**
+             * 指定reply to的destination地址
+             */
+            message.setJMSReplyTo(session.createQueue("reply"));
             producer.send(message);
             //Thread.sleep(1000);
         }
